@@ -1,0 +1,127 @@
+#Lisätään tarvittavat moduulit
+import json
+import os
+
+class Kalenteri:
+    
+    def __init__(self):
+        """
+        Tehdään tarvittavat sanakirjat.
+        """
+        self.muistiinpanot = {}
+        self.muistutukset = {}
+        #Määritellään tiedoston nimi
+        self.tiedosto_nimi = "kalenteri_tila.json"
+
+    def avaa_kalenteri(self):
+        """
+        Tehdään funktio, jolla kalenteri voidaan lukea tiedostoista.
+        """
+        if os.path.exists(self.tiedosto_nimi):
+            with open(self.tiedosto_nimi, 'r') as tiedosto:
+                data = json.load(tiedosto)
+                self.muistiinpanot = data.get('muistiinpanot', {})
+                self.muistutukset = data.get('muistutukset', {})
+            print("Kalenteri avattu.")
+        else:
+            print("Tiedostoa ei löydy. Luodaan uusi kalenteri.")
+
+    def tallenna_kalenteri(self):
+        """
+        Tehdään funktio, jolla kalenteri voidaan tallentaa tiedostoon.
+        """
+        data = {'muistiinpanot': self.muistiinpanot, 'muistutukset': self.muistutukset}
+        with open(self.tiedosto_nimi, 'w') as tiedosto:
+            json.dump(data, tiedosto)
+        print("Kalenteri tallennettu.")
+
+    def lisää_muistiinpano(self, päivämäärä, muistiinpano):
+        """
+        Tehdään funktio muistinpanojen lisäämiseksi tietylle päivämäärälle.
+        """
+        self.muistiinpanot.setdefault(päivämäärä, []).append(muistiinpano)
+        print(f"{muistiinpano} lisätty päivämäärälle {päivämäärä}.")
+
+    def lisää_muistutus(self, päivämäärä, muistutus):
+        """
+        Tehdään funktio muistutusten lisäämiseksi tietylle päivämäärälle.
+        """
+        self.muistutukset.setdefault(päivämäärä, []).append(muistutus)
+        print(f"{muistutus} lisätty päivämäärälle {päivämäärä}.")
+
+    def poista_muistiinpano(self, päivämäärä, muistiinpano):
+        """
+        Tehdään funktio, jolla on mahdollista poistaa tehtyjä muistiinpanoja.
+        """
+        if päivämäärä in self.muistiinpanot and muistiinpano in self.muistiinpanot[päivämäärä]:
+            self.muistiinpanot[päivämäärä].remove(muistiinpano)
+            print(f"{muistiinpano} poistettu päivältä {päivämäärä}.")
+        else:
+            print(f"{muistiinpano} ei löydy päivältä {päivämäärä}.")
+
+    def poista_muistutus(self, päivämäärä, muistutus):
+        """
+        Tehdään funtio, jolla on mahdollista poistaa tehtyjä muistutuksia.
+        """
+        if päivämäärä in self.muistutukset and muistutus in self.muistutukset[päivämäärä]:
+            self.muistutukset[päivämäärä].remove(muistutus)
+            print(f"{muistutus} poistettu päivältä {päivämäärä}.")
+        else:
+            print(f"{muistutus} ei löydy päivältä {päivämäärä}.")
+
+    def näytä_päivän_tiedot(self, päivämäärä):
+        """
+        Tehdään funktio, joka näyttää syötetyn päivän tiedot.
+        """
+        muistiinpanot = self.muistiinpanot.get(päivämäärä, [])
+        muistutukset = self.muistutukset.get(päivämäärä, [])
+
+        print(f"Päivän tiedot ({päivämäärä}):")
+        print("Muistiinpanot:", muistiinpanot)
+        print("Muistutukset:", muistutukset)
+
+def main():
+    """
+    Tehdään funktio ohjelman päätoiminnoista.
+    """
+    kalenteri = Kalenteri()
+    kalenteri.avaa_kalenteri()
+
+    while True:
+        print("1. Lisää muistiinpano")
+        print("2. Lisää muistutus")
+        print("3. Näytä päivän tiedot")
+        print("4. Poista muistiinpano")
+        print("5. Poista muistutus")
+        print("6. Tallenna ja poistu")
+
+        valinta = input("Valitse toiminto (1-6): ")
+        
+        if valinta == '1':
+            päivämäärä = input("Anna päivämäärä (vvvv-kk-pp): ")
+            muistiinpano = input("Lisää muistiinpano: ")
+            kalenteri.lisää_muistiinpano(päivämäärä, muistiinpano)
+        elif valinta == '2':
+            päivämäärä = input("Anna päivämäärä (vvvv-kk-pp): ")
+            muistutus = input("Lisää muistutus: ")
+            kalenteri.lisää_muistutus(päivämäärä, muistutus)
+        elif valinta == '3':
+            päivämäärä = input("Anna päivämäärä (vvvv-kk-pp): ")
+            kalenteri.näytä_päivän_tiedot(päivämäärä)
+        elif valinta == '4':
+            päivämäärä= input("Anna päivämäärä (vvvv-kk-pp): ")
+            muistiinpano = input("Anna poistettava muistiinpano: ")
+            kalenteri.poista_muistiinpano(päivämäärä, muistiinpano)
+        elif valinta == '5':
+            päivämäärä = input("Anna päivämäärä (vvvv-kk-pp): ")
+            muistutus = input("Anna poistettava muistutus: ")
+            kalenteri.poista_muistutus(päivämäärä, muistutus)
+        elif valinta == '6':
+            kalenteri.tallenna_kalenteri()
+            break
+        else:
+            print("Antamasi syöte ei kelpaa. Yritä uudelleen.")
+
+if __name__ == "__main__":
+    main()
+    
